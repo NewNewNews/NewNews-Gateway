@@ -49,11 +49,10 @@ func (d *Database) GetUserByEmail(ctx context.Context, email string) (*models.Us
 }
 
 func (d *Database) CreateLog(ctx context.Context, log *models.Log) error {
-	// _, err := d.client.Log.CreateOne(
-	// 	db.Log.Action.Set(log.Action),
-	// 	db.Log.Timestamp.Set(log.Timestamp),
-	// 	db.Log.User.Link(
-	// 		db.User.ID.Equals(log.UserID)),
-	// ).Exec(ctx)
-	return 
+	_, err := d.client.Log.CreateOne(
+		db.Log.User.Link(db.User.ID.Equals(log.UserID)),
+		db.Log.Action.Set(log.Action),
+		db.Log.Timestamp.Set(log.Timestamp),
+	).Exec(ctx)
+	return err
 }
