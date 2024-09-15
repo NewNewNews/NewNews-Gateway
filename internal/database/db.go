@@ -4,37 +4,38 @@ import (
 	"context"
 
 	"github.com/NewNewNews/NewNews-Gateway/internal/models"
+	"github.com/NewNewNews/NewNews-Gateway/prisma/db"
 )
 
 type Database struct {
-	client *PrismaClient
+	client *db.PrismaClient
 }
 
 func New(databaseURL string) (*Database, error) {
-	client := NewClient()
-	if err := client.Connect(); err != nil {
+	client := db.NewClient()
+	if err := client.Prisma.Connect(); err != nil {
 		return nil, err
 	}
 
 	return &Database{client: client}, nil
 }
 
-func (db *Database) Disconnect() error {
-	return db.client.Disconnect()
+func (d *Database) Disconnect() error {
+	return d.client.Prisma.Disconnect()
 }
 
-func (db *Database) CreateUser(ctx context.Context, user *models.User) error {
-	_, err := db.client.User.CreateOne(
-		User.Email.Set(user.Email),
-		User.HashedPassword.Set(user.HashedPassword),
-		User.IsAdmin.Set(user.IsAdmin),
+func (d *Database) CreateUser(ctx context.Context, user *models.User) error {
+	_, err := d.client.User.CreateOne(
+		db.User.Email.Set(user.Email),
+		db.User.HashedPassword.Set(user.HashedPassword),
+		db.User.IsAdmin.Set(user.IsAdmin),
 	).Exec(ctx)
 	return err
 }
 
-func (db *Database) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
-	user, err := db.client.User.FindUnique(
-		User.Email.Equals(email),
+func (d *Database) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+	user, err := d.client.User.FindUnique(
+		db.User.Email.Equals(email),
 	).Exec(ctx)
 	if err != nil {
 		return nil, err
@@ -47,11 +48,12 @@ func (db *Database) GetUserByEmail(ctx context.Context, email string) (*models.U
 	}, nil
 }
 
-func (db *Database) CreateLog(ctx context.Context, log *models.Log) error {
-	_, err := db.client.Log.CreateOne(
-		Log.UserID.Set(log.UserID),
-		Log.Action.Set(log.Action),
-		Log.Timestamp.Set(log.Timestamp),
-	).Exec(ctx)
-	return err
+func (d *Database) CreateLog(ctx context.Context, log *models.Log) error {
+	// _, err := d.client.Log.CreateOne(
+	// 	db.Log.Action.Set(log.Action),
+	// 	db.Log.Timestamp.Set(log.Timestamp),
+	// 	db.Log.User.Link(
+	// 		db.User.ID.Equals(log.UserID)),
+	// ).Exec(ctx)
+	return 
 }
