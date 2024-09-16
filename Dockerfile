@@ -5,6 +5,9 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
+COPY prisma ./prisma
+RUN go run github.com/steebchen/prisma-client-go generate
+
 COPY . .
 RUN go build -o gateway ./cmd/server
 
