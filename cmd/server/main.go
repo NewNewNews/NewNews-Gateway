@@ -35,7 +35,7 @@ func main() {
 	jwt := auth.NewJWTManager(cfg.JWTSecret, cfg.JWTExpirationHours)
 
 	// Set up gRPC connection to news service
-	newsConn, err := grpc.NewClient("news_service:50051", grpc.WithInsecure())
+	newsConn, err := grpc.NewClient("localhost:50051", grpc.WithInsecure()) //"news_service:50051"
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Failed to connect to news service")
 	}
