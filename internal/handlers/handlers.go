@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -8,19 +9,21 @@ import (
 	"github.com/NewNewNews/NewNews-Gateway/internal/auth"
 	"github.com/NewNewNews/NewNews-Gateway/internal/database"
 	"github.com/NewNewNews/NewNews-Gateway/internal/models"
+	"github.com/NewNewNews/NewNews-Gateway/internal/proto"
 	"github.com/golang-jwt/jwt"
 	"github.com/rs/zerolog"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Handler struct {
-	db     *database.Database
-	jwt    *auth.JWTManager
-	logger zerolog.Logger
+	db         *database.Database
+	jwt        *auth.JWTManager
+	logger     zerolog.Logger
+	newsClient proto.NewsServiceClient
 }
 
-func New(db *database.Database, jwt *auth.JWTManager, logger zerolog.Logger) *Handler {
-	return &Handler{db: db, jwt: jwt, logger: logger}
+func New(db *database.Database, jwt *auth.JWTManager, logger zerolog.Logger, newsClient proto.NewsServiceClient) *Handler {
+	return &Handler{db: db, jwt: jwt, logger: logger, newsClient: newsClient}
 }
 
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
@@ -93,4 +96,40 @@ func (h *Handler) Protected(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(map[string]string{"message": "Access granted to protected resource"})
+}
+
+func (h *Handler) GetNews(w http.ResponseWriter, r *http.Request) {
+	category := r.URL.Query().Get("category")
+	date := r.URL.Query().Get("date")
+
+	resp, err := h.newsClient.GetNews(context.Background(), &proto.GetNewsRequest{
+		Category: category,
+		Date:     date,
+	})
+	if err != nil {
+		http.Error(w, "Failed to get news", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(resp.News)
+}
+
+func (h *Handler) ScrapeNews(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		URL string `json:"url"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	resp, err := h.newsClient.ScrapeNews(context.Background(), &proto.ScrapeNewsRequest{
+		Url: req.URL,
+	})
+	if err != nil {
+		http.Error(w, "Failed to scrape news", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(map[string]bool{"success": resp.Success})
 }

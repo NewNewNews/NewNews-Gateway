@@ -5,4 +5,5 @@ type User struct {
 	Email          string `json:"email"`
 	HashedPassword string `json:"-"`
 	IsAdmin        bool   `json:"is_admin"`
+	Name           string `json:"name"`
 }

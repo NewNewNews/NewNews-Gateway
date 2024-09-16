@@ -28,6 +28,7 @@ func (d *Database) CreateUser(ctx context.Context, user *models.User) error {
 	_, err := d.client.User.CreateOne(
 		db.User.Email.Set(user.Email),
 		db.User.HashedPassword.Set(user.HashedPassword),
+		db.User.Name.Set(user.Name),
 		db.User.IsAdmin.Set(user.IsAdmin),
 	).Exec(ctx)
 	return err

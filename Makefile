@@ -20,13 +20,13 @@ proto: $(GOOGLE_APIS_DIR)
 		--go_out . --go_opt paths=source_relative \
 		--go-grpc_out . --go-grpc_opt paths=source_relative \
 		--grpc-gateway_out . --grpc-gateway_opt paths=source_relative \
-		$(PROTO_DIR)/service.proto
+		$(PROTO_DIR)/service.proto $(PROTO_DIR)/news_service.proto
 
 # For Windows PowerShell
-proto-windows: $(GOOGLE_APIS_DIR)
-	protoc -I . `
-		-I$(PROTO_DIR) `
-		--go_out . --go_opt paths=source_relative `
-		--go-grpc_out . --go-grpc_opt paths=source_relative `
-		--grpc-gateway_out . --grpc-gateway_opt paths=source_relative `
-		$(PROTO_DIR)/service.proto
+# proto-windows: $(GOOGLE_APIS_DIR)
+# 	protoc -I . `
+# 		-I$(PROTO_DIR) `
+# 		--go_out . --go_opt paths=source_relative `
+# 		--go-grpc_out . --go-grpc_opt paths=source_relative `
+# 		--grpc-gateway_out . --grpc-gateway_opt paths=source_relative `
+# 		$(PROTO_DIR)/service.proto $(PROTO_DIR)/news_service.proto
