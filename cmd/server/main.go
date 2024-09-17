@@ -11,8 +11,8 @@ import (
 	"github.com/NewNewNews/NewNews-Gateway/internal/logger"
 	"github.com/NewNewNews/NewNews-Gateway/internal/proto"
 	"github.com/joho/godotenv"
-	"google.golang.org/grpc"
 	"github.com/rs/cors"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -36,7 +36,7 @@ func main() {
 	jwt := auth.NewJWTManager(cfg.JWTSecret, cfg.JWTExpirationHours)
 
 	// Set up gRPC connection to news service
-	newsConn, err := grpc.NewClient("localhost:50051", grpc.WithInsecure()) //"news_service:50051"
+	newsConn, err := grpc.NewClient("0.0.0.0:50051", grpc.WithInsecure()) //"news_service:50051"
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Failed to connect to news service")
 	}
@@ -46,24 +46,26 @@ func main() {
 	handler := handlers.New(db, jwt, logger, newsClient)
 
 	corsHandler := cors.New(cors.Options{
-        AllowedOrigins: []string{"http://localhost:3000"}, // Your frontend origin
-        AllowCredentials: true,
-        AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-        AllowedHeaders:   []string{"Content-Type", "Authorization"},
-    })
+		AllowedOrigins:   []string{"http://localhost:3000"}, // Your frontend origin
+		AllowCredentials: true,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+	})
 
-    mux := http.NewServeMux()
-    mux.HandleFunc("/api/register", handler.Register)
-    mux.HandleFunc("/api/login", handler.Login)
-    mux.Handle("/api/protected", auth.Middleware(jwt, handler.Protected))
-    mux.HandleFunc("/api/news", handler.GetNews)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/register", handler.Register)
+	mux.HandleFunc("/api/login", handler.Login)
+	mux.Handle("/api/protected", auth.Middleware(jwt, handler.Protected))
+	mux.HandleFunc("/api/news", handler.GetNews)
 	mux.HandleFunc("/api/oneNews", handler.GetOneNews)
-    mux.HandleFunc("/api/scrape", handler.ScrapeNews)
+	mux.HandleFunc("/api/scrape", handler.ScrapeNews)
 	mux.HandleFunc("/api/updateNews", handler.UpdateNews)
 	mux.HandleFunc("/api/deleteNews", handler.DeleteNews)
-
-    // Apply CORS middleware
-    handlerWithCORS := corsHandler.Handler(mux)
+	mux.HandleFunc("/api/getall", handler.GetAllUsers)
+	mux.HandleFunc("/api/user/update", handler.UpdateUserByEmail)
+	mux.HandleFunc("/api/user/remove", handler.DeleteUser)
+	// Apply CORS middleware
+	handlerWithCORS := corsHandler.Handler(mux)
 
 	logger.Info().Msgf("Server starting on :%s", cfg.Port)
 	if err := http.ListenAndServe(":"+cfg.Port, handlerWithCORS); err != nil {

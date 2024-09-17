@@ -13,17 +13,38 @@ service GatewayService {
       body: "*"
     };
   }
-  
+
   rpc Login(LoginRequest) returns (LoginResponse) {
     option (google.api.http) = {
       post: "/api/login"
       body: "*"
     };
   }
-  
+
   rpc Protected(ProtectedRequest) returns (ProtectedResponse) {
     option (google.api.http) = {
       get: "/api/protected"
+    };
+  }
+
+  rpc GetAllUsers(GetAllUsersRequest) returns (GetAllUsersResponse) {
+    option (google.api.http) = {
+      post: "/api/getall"
+      body: "*"
+    };
+  }
+
+  rpc UpdateUserByEmail(UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      put: "/api/user/update"
+      body: "*"
+    };
+  }
+
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
+    option (google.api.http) = {
+      post: "/api/user/remove"
+      body: "*"
     };
   }
 }
@@ -49,5 +70,37 @@ message LoginResponse {
 message ProtectedRequest {}
 
 message ProtectedResponse {
+  string message = 1;
+}
+
+message GetAllUsersRequest {}
+
+message GetAllUsersResponse {
+  repeated User users = 1;
+}
+
+message User {
+  string id = 1;
+  string email = 2;
+  string name = 3;
+  bool isAdmin = 4;
+}
+
+message UpdateUserRequest {
+  string email = 1;
+  string name = 2;
+  string password = 3;
+  bool isAdmin = 4;
+}
+
+message UpdateUserResponse {
+  string message = 1;
+}
+
+message DeleteUserRequest {
+  string email = 1;
+}
+
+message DeleteUserResponse {
   string message = 1;
 }

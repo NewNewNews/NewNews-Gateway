@@ -55,6 +55,45 @@ func (d *Database) GetUserByEmail(ctx context.Context, email string) (*models.Us
 	}, nil
 }
 
+func (d *Database) GetAllUsers(ctx context.Context) ([]*models.User, error) {
+	users, err := d.client.User.FindMany().Exec(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var allUsers []*models.User
+	for _, user := range users {
+		allUsers = append(allUsers, &models.User{
+			ID:             user.ID,
+			Email:          user.Email,
+			HashedPassword: user.HashedPassword,
+			IsAdmin:        user.IsAdmin,
+		})
+	}
+	return allUsers, nil
+}
+
+func (d *Database) UpdateUserByEmail(ctx context.Context, email string, updatedUser *models.User) error {
+	_, err := d.client.User.FindUnique(
+		db.User.Email.Equals(email),
+	).Update(
+		db.User.Email.Set(updatedUser.Email),
+		db.User.HashedPassword.Set(updatedUser.HashedPassword),
+		db.User.Name.Set(updatedUser.Name),
+		db.User.IsAdmin.Set(updatedUser.IsAdmin),
+	).Exec(ctx)
+
+	return err
+}
+
+func (d *Database) DeleteUser(ctx context.Context, email string) error {
+	_, err := d.client.User.FindUnique(
+		db.User.Email.Equals(email),
+	).Delete().Exec(ctx)
+
+	return err
+}
+
 func (d *Database) CreateLog(ctx context.Context, log *models.Log) error {
 	_, err := d.client.Log.CreateOne(
 		db.Log.User.Link(db.User.ID.Equals(log.UserID)),
