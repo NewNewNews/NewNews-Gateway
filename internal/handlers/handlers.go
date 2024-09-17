@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
@@ -134,4 +135,85 @@ func (h *Handler) ScrapeNews(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(map[string]bool{"success": resp.Success})
+}
+
+func (h *Handler) UpdateNews(w http.ResponseWriter, r *http.Request) {
+	var updateReq struct {
+		ID        string `json:"id"`
+		Data      string `json:"data"`
+		Category  string `json:"category"`
+		Date      string `json:"date"`
+		Publisher string `json:"publisher"`
+		URL       string `json:"url"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&updateReq); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	resp, err := h.newsClient.UpdateNews(context.Background(), &proto.UpdateNewsRequest{
+		Id:        updateReq.ID,
+		Data:      updateReq.Data,
+		Category:  updateReq.Category,
+		Date:      updateReq.Date,
+		Publisher: updateReq.Publisher,
+		Url:       updateReq.URL,
+	})
+	if err != nil {
+		http.Error(w, "Failed to update news", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": resp.Success,
+		"message": resp.Message,
+	})
+}
+
+func (h *Handler) DeleteNews(w http.ResponseWriter, r *http.Request) {
+	var deleteReq struct {
+		ID        string `json:"id"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&deleteReq); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	resp, err := h.newsClient.DeleteNews(context.Background(), &proto.DeleteNewsRequest{
+		Id:        deleteReq.ID,
+	})
+
+	if err != nil {
+		http.Error(w, "Failed to delete news", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": resp.Success,
+		"message": resp.Message,
+	})
+}
+
+func (h *Handler) GetOneNews(w http.ResponseWriter, r *http.Request) {
+	var oneNewsReq struct {
+		ID        string `json:"id"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&oneNewsReq); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+    resp, err := h.newsClient.GetOneNews(context.Background(), &proto.GetOneNewsRequest{
+        Id: oneNewsReq.ID,
+    })
+
+	if err != nil {
+		log.Printf("Failed to get one news: %v", err)
+		http.Error(w, "Failed to get one news", http.StatusInternalServerError)
+		return
+	}
+	
+
+    json.NewEncoder(w).Encode(resp.News)
 }

@@ -57,7 +57,10 @@ func main() {
     mux.HandleFunc("/api/login", handler.Login)
     mux.Handle("/api/protected", auth.Middleware(jwt, handler.Protected))
     mux.HandleFunc("/api/news", handler.GetNews)
+	mux.HandleFunc("/api/oneNews", handler.GetOneNews)
     mux.HandleFunc("/api/scrape", handler.ScrapeNews)
+	mux.HandleFunc("/api/updateNews", handler.UpdateNews)
+	mux.HandleFunc("/api/deleteNews", handler.DeleteNews)
 
     // Apply CORS middleware
     handlerWithCORS := corsHandler.Handler(mux)
