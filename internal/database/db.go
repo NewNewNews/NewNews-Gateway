@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/NewNewNews/NewNews-Gateway/internal/models"
 	"github.com/NewNewNews/NewNews-Gateway/prisma/db"
@@ -14,7 +15,7 @@ type Database struct {
 func New(databaseURL string) (*Database, error) {
 	client := db.NewClient()
 	if err := client.Prisma.Connect(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to connect to the database: %w", err)
 	}
 
 	return &Database{client: client}, nil
@@ -31,7 +32,12 @@ func (d *Database) CreateUser(ctx context.Context, user *models.User) error {
 		db.User.Name.Set(user.Name),
 		db.User.IsAdmin.Set(user.IsAdmin),
 	).Exec(ctx)
-	return err
+
+	if err != nil {
+		return fmt.Errorf("failed to create user: %w", err)
+	}
+
+	return nil
 }
 
 func (d *Database) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
@@ -39,7 +45,7 @@ func (d *Database) GetUserByEmail(ctx context.Context, email string) (*models.Us
 		db.User.Email.Equals(email),
 	).Exec(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get user by email %s: %w", email, err)
 	}
 	return &models.User{
 		ID:             user.ID,
@@ -94,5 +100,10 @@ func (d *Database) CreateLog(ctx context.Context, log *models.Log) error {
 		db.Log.Action.Set(log.Action),
 		db.Log.Timestamp.Set(log.Timestamp),
 	).Exec(ctx)
-	return err
+	
+	if err != nil {
+		return fmt.Errorf("failed to create log for userID %s: %w", log.UserID, err)
+	}
+
+	return nil
 }

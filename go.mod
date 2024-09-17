@@ -17,6 +17,7 @@ require (
 require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
+	github.com/rs/cors v1.11.1
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/steebchen/prisma-client-go v0.41.0 // indirect
 	golang.org/x/net v0.29.0 // indirect

@@ -12,6 +12,7 @@ import (
 	"github.com/NewNewNews/NewNews-Gateway/internal/proto"
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -44,14 +45,25 @@ func main() {
 
 	handler := handlers.New(db, jwt, logger, newsClient)
 
-	http.HandleFunc("/api/register", handler.Register)
-	http.HandleFunc("/api/login", handler.Login)
-	http.Handle("/api/protected", auth.Middleware(jwt, handler.Protected))
-	http.HandleFunc("/api/news", handler.GetNews)
-	http.HandleFunc("/api/scrape", handler.ScrapeNews)
+	corsHandler := cors.New(cors.Options{
+        AllowedOrigins: []string{"http://localhost:3000"}, // Your frontend origin
+        AllowCredentials: true,
+        AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+        AllowedHeaders:   []string{"Content-Type", "Authorization"},
+    })
+
+    mux := http.NewServeMux()
+    mux.HandleFunc("/api/register", handler.Register)
+    mux.HandleFunc("/api/login", handler.Login)
+    mux.Handle("/api/protected", auth.Middleware(jwt, handler.Protected))
+    mux.HandleFunc("/api/news", handler.GetNews)
+    mux.HandleFunc("/api/scrape", handler.ScrapeNews)
+
+    // Apply CORS middleware
+    handlerWithCORS := corsHandler.Handler(mux)
 
 	logger.Info().Msgf("Server starting on :%s", cfg.Port)
-	if err := http.ListenAndServe(":"+cfg.Port, nil); err != nil {
+	if err := http.ListenAndServe(":"+cfg.Port, handlerWithCORS); err != nil {
 		logger.Fatal().Err(err).Msg("Failed to start server")
 	}
 }
