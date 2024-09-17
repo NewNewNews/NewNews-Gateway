@@ -41,29 +41,10 @@ service GatewayService {
     };
   }
 
-  rpc DeleteUserByEmail(DeleteUserRequest) returns (DeleteUserResponse) {
-    option (google.api.http) = {
-      delete: "/api/user/delete"
-      body: "*"
-    };
-  }
-
-  rpc GetAllUsers(GetAllUsersRequest) returns (GetAllUsersResponse) {
-    option (google.api.http) = {
-      get: "/api/users"
-    };
-  }
-
-  rpc UpdateUserByEmail(UpdateUserByEmailRequest) returns (UpdateUserByEmailResponse) {
-    option (google.api.http) = {
-      put: "/api/users/{email}"
-      body: "*"
-    };
-  }
-
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
     option (google.api.http) = {
-      delete: "/api/users/{email}"
+      post: "/api/user/remove"
+      body: "*"
     };
   }
 }

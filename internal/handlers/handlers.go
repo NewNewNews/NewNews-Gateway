@@ -137,11 +137,11 @@ func (h *Handler) ScrapeNews(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
-	claims, ok := r.Context().Value("user").(*jwt.MapClaims)
-	if !ok || !(*claims)["is_admin"].(bool) {
-		http.Error(w, "Forbidden: Admins only", http.StatusForbidden)
-		return
-	}
+	// claims, ok := r.Context().Value("user").(*jwt.MapClaims)
+	// if !ok || !(*claims)["is_admin"].(bool) {
+	// 	http.Error(w, "Forbidden: Admins only", http.StatusForbidden)
+	// 	return
+	// }
 
 	users, err := h.db.GetAllUsers(r.Context())
 	if err != nil {
@@ -159,13 +159,13 @@ func (h *Handler) UpdateUserByEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	email := r.URL.Query().Get("email")
-	if email == "" {
+	// Ensure email is provided in the request body
+	if updatedUser.Email == "" {
 		http.Error(w, "Email is required", http.StatusBadRequest)
 		return
 	}
 
-	if err := h.db.UpdateUserByEmail(r.Context(), email, &updatedUser); err != nil {
+	if err := h.db.UpdateUserByEmail(r.Context(), updatedUser.Email, &updatedUser); err != nil {
 		http.Error(w, "Failed to update user", http.StatusInternalServerError)
 		return
 	}
@@ -174,12 +174,25 @@ func (h *Handler) UpdateUserByEmail(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
-	email := r.URL.Query().Get("email")
+	// Define a struct to capture the email from the request body
+	var requestBody struct {
+		Email string `json:"email"`
+	}
+
+	// Decode the request body
+	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	// Extract the email
+	email := requestBody.Email
 	if email == "" {
 		http.Error(w, "Email is required", http.StatusBadRequest)
 		return
 	}
 
+	// Perform the delete operation
 	if err := h.db.DeleteUser(r.Context(), email); err != nil {
 		http.Error(w, "Failed to delete user", http.StatusInternalServerError)
 		return
