@@ -26,6 +26,25 @@ service GatewayService {
       get: "/api/protected"
     };
   }
+
+  rpc GetAllUsers(GetAllUsersRequest) returns (GetAllUsersResponse) {
+    option (google.api.http) = {
+      get: "/api/users"
+    };
+  }
+
+  rpc UpdateUserByEmail(UpdateUserByEmailRequest) returns (UpdateUserByEmailResponse) {
+    option (google.api.http) = {
+      put: "/api/users/{email}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
+    option (google.api.http) = {
+      delete: "/api/users/{email}"
+    };
+  }
 }
 
 message RegisterRequest {
