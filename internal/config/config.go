@@ -11,6 +11,7 @@ type Config struct {
 	DatabaseURL        string
 	JWTSecret          string
 	JWTExpirationHours time.Duration
+	ScraperURL         string
 }
 
 func Load() (*Config, error) {
@@ -24,5 +25,6 @@ func Load() (*Config, error) {
 		DatabaseURL:        os.Getenv("DATABASE_URL"),
 		JWTSecret:          os.Getenv("JWT_SECRET"),
 		JWTExpirationHours: time.Duration(jwtExpirationHours) * time.Hour,
+		ScraperURL:         os.Getenv("SCRAPER_SERVICE"),
 	}, nil
 }

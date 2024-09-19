@@ -8,6 +8,9 @@ services:
       - db
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/gateway?schema=public
+      - SCRAPER_SERVICE=news_service:50051
+    networks:
+      - my-custom-network
 
   db:
     image: postgres:13
@@ -19,11 +22,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - my-custom-network
 
 volumes:
   postgres_data:
 
 networks:
-  default:
-    external:
-      name: common_network
+  my-custom-network:
+    external: true

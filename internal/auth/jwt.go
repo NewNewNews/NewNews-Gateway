@@ -3,45 +3,24 @@ package auth
 import (
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt"
 )
 
 type JWTManager struct {
-	secretKey     []byte
-	tokenDuration time.Duration
+	secretKey  string
+	expiration time.Duration
 }
 
-func NewJWTManager(secretKey string, tokenDuration time.Duration) *JWTManager {
-	return &JWTManager{
-		secretKey:     []byte(secretKey),
-		tokenDuration: tokenDuration,
-	}
+func NewJWTManager(secretKey string, expiration time.Duration) *JWTManager {
+	return &JWTManager{secretKey: secretKey, expiration: expiration}
 }
 
-func (m *JWTManager) Generate(userID string, isAdmin bool) (string, error) {
-	claims := jwt.MapClaims{
-		"user_id":  userID,
-		"is_admin": isAdmin,
-		"exp":      time.Now().Add(m.tokenDuration).Unix(),
+func (manager *JWTManager) Generate(userID string, isAdmin bool) (string, error) {
+	claims := jwt.StandardClaims{
+		Subject:   userID,
+		ExpiresAt: time.Now().Add(manager.expiration).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(m.secretKey)
-}
-
-func (m *JWTManager) Verify(tokenString string) (*jwt.MapClaims, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return m.secretKey, nil
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || !token.Valid {
-		return nil, jwt.ErrSignatureInvalid
-	}
-
-	return &claims, nil
+	return token.SignedString([]byte(manager.secretKey))
 }
