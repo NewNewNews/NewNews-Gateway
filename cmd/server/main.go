@@ -73,14 +73,40 @@ func main() {
 	r.Use(cors.New(config))
 
 	// Define routes
+	// Route user
 	r.POST("/api/register", handler.Register)
 	r.POST("/api/login", handler.Login)
+	r.POST("/api/logout", handler.Logout)
+
+	protected := r.Group("/api")
+	protected.Use(auth.AuthMiddleware(jwt))
+	{
+		protected.GET("/getall", handler.GetAllUsers)
+	}
+
 	r.GET("/api/protected", auth.GinMiddleware(jwt), handler.Protected)
-	r.GET("/api/news", handler.GetNews)
-	r.POST("/api/scrape", handler.ScrapeNews)
-	r.GET("/api/getall", handler.GetAllUsers)
+	// r.GET("/api/getall", handler.GetAllUsers)
 	r.PUT("/api/user/update", handler.UpdateUserByEmail)
 	r.DELETE("/api/user/remove", handler.DeleteUser)
+
+	// Route scraper
+	r.GET("/api/news", handler.GetNews)
+	r.POST("/api/scrape", handler.ScrapeNews)
+	r.PUT("/api/news", handler.UpdateNews)
+	r.DELETE("/api/news", handler.DeleteNews)
+	r.GET("/api/news/one", handler.GetOneNews)
+
+
+	// admin := r.Group("/api/admin")
+	// admin.Use(auth.AuthMiddleware(jwt), auth.AdminMiddleware())
+	// {
+	// 	admin.POST("/scrape", handler.ScrapeNews)
+	// 	admin.PUT("/news", handler.UpdateNews)
+	// 	admin.DELETE("/news", handler.DeleteNews)
+	// 	admin.GET("/users", handler.GetAllUsers)
+	// 	admin.PUT("/user", handler.UpdateUserByEmail)
+	// 	admin.DELETE("/user", handler.DeleteUser)
+	// }
 
 	logger.Info().Msgf("Server starting on :%s", cfg.Port)
 	if err := r.Run(":" + cfg.Port); err != nil {

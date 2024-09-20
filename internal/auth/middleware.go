@@ -48,3 +48,50 @@ func GinMiddleware(jwtManager *JWTManager) gin.HandlerFunc {
 		c.Next()
 	}
 }
+func AuthMiddleware(jwtManager *JWTManager) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		tokenString, err := c.Cookie("auth_token")
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+			c.Abort()
+			return
+		}
+
+		claims, err := jwtManager.Validate(tokenString)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
+			c.Abort()
+			return
+		}
+
+		// Set the user claims in the context
+		c.Set("user", claims)
+		c.Next()
+	}
+}
+
+func AdminMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		claims, exists := c.Get("user")
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+			c.Abort()
+			return
+		}
+
+		customClaims, ok := claims.(*CustomClaims)
+		if !ok {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid claims type"})
+			c.Abort()
+			return
+		}
+
+		if !customClaims.IsAdmin {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Admin access required"})
+			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
+}

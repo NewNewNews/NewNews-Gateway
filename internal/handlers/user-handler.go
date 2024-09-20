@@ -57,7 +57,23 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	// Set the token in a cookie
+	c.SetCookie(
+		"auth_token",
+		token,
+		int(h.jwt.GetExpiration().Seconds()), // Max age in seconds
+		"/",                                  // Path
+		"",                                   // Domain
+		true,                                 // Secure
+		true,                                 // HttpOnly
+	)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Login successful"})
+}
+
+func (h *Handler) Logout(c *gin.Context) {
+	c.SetCookie("auth_token", "", -1, "/", "", true, true)
+	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }
 
 func (h *Handler) GetAllUsers(c *gin.Context) {
