@@ -64,11 +64,15 @@ func (h *Handler) Login(c *gin.Context) {
 		int(h.jwt.GetExpiration().Seconds()), // Max age in seconds
 		"/",                                  // Path
 		"",                                   // Domain
-		true,                                 // Secure
-		true,                                 // HttpOnly
+		false,                                 // Secure
+		false,                                 // HttpOnly
 	)
 
-	c.JSON(http.StatusOK, gin.H{"message": "Login successful"})
+	// c.JSON(http.StatusOK, gin.H{"message": "Login successful"})
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Login successful",
+		"email": user.Email,
+	})
 }
 
 func (h *Handler) Logout(c *gin.Context) {
