@@ -76,6 +76,21 @@ func (h *Handler) Logout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }
 
+func (h *Handler) GetMe(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	user, err := h.db.GetUserByID(c, userID.(string))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user"})
+		return
+	}
+	c.JSON(http.StatusOK, user)
+}
+
 func (h *Handler) GetAllUsers(c *gin.Context) {
 	users, err := h.db.GetAllUsers(c)
 	if err != nil {

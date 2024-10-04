@@ -55,6 +55,22 @@ func (d *Database) GetUserByEmail(ctx context.Context, email string) (*models.Us
 	}, nil
 }
 
+func (d *Database) GetUserByID(ctx context.Context, id string) (*models.User, error) {
+	user, err := d.client.User.FindUnique(
+		db.User.ID.Equals(id),
+	).Exec(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user by email %s: %w", id, err)
+	}
+	return &models.User{
+		ID:             user.ID,
+		Name:           user.Name,
+		Email:          user.Email,
+		HashedPassword: user.HashedPassword,
+		IsAdmin:        user.IsAdmin,
+	}, nil
+}
+
 func (d *Database) GetAllUsers(ctx context.Context) ([]*models.User, error) {
 	users, err := d.client.User.FindMany().Exec(ctx)
 	if err != nil {
@@ -100,7 +116,7 @@ func (d *Database) CreateLog(ctx context.Context, log *models.Log) error {
 		db.Log.Action.Set(log.Action),
 		db.Log.Timestamp.Set(log.Timestamp),
 	).Exec(ctx)
-	
+
 	if err != nil {
 		return fmt.Errorf("failed to create log for userID %s: %w", log.UserID, err)
 	}

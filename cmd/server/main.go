@@ -77,11 +77,17 @@ func main() {
 	r.POST("/api/register", handler.Register)
 	r.POST("/api/login", handler.Login)
 	r.POST("/api/logout", handler.Logout)
-
-	protected := r.Group("/api")
+	// r.GET("/api/me", auth.AuthMiddleware(jwt), handler.GetMe)
+	protected := r.Group("/api/protected")
 	protected.Use(auth.AuthMiddleware(jwt))
 	{
-		protected.GET("/getall", handler.GetAllUsers)
+		protected.GET("/me", handler.GetMe)
+	}
+
+	admin := r.Group("/api/admin")
+	admin.Use(auth.AuthMiddleware(jwt), auth.AdminMiddleware())
+	{
+		admin.GET("/getall", handler.GetAllUsers)
 	}
 
 	r.GET("/api/protected", auth.GinMiddleware(jwt), handler.Protected)
@@ -95,7 +101,6 @@ func main() {
 	r.PUT("/api/news", handler.UpdateNews)
 	r.DELETE("/api/news", handler.DeleteNews)
 	r.GET("/api/news/one", handler.GetOneNews)
-
 
 	// admin := r.Group("/api/admin")
 	// admin.Use(auth.AuthMiddleware(jwt), auth.AdminMiddleware())
