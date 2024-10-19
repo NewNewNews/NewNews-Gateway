@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package news;
+
+option go_package = "github.com/yourusername/gateway/internal/proto";
+
+service AudioService {
+  rpc GetAudioFile (AudioRequest) returns (AudioResponse) {}
+  rpc ReceiveNewsContent (NewsContentRequest) returns (NewsContentResponse) {}
+}
+
+message AudioRequest {
+  string news_id = 1;
+}
+
+message AudioResponse {
+  bytes audio_data = 1;
+  string file_name = 2;
+}
+
+message NewsContentRequest {
+  string news_id = 1;
+  string content = 2;
+}
+
+message NewsContentResponse {
+  bool success = 1;
+  string message = 2;
+}
