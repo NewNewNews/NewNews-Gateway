@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package summaryservice;
+
+option go_package = "github.com/yourusername/gateway/internal/proto";
+
+service SummaryService {
+  rpc SummarizeNews (SummaryNewsRequest) returns (SummaryNewsResponse) {}
+}
+
+message SummaryNewsRequest {
+  string url = 1;
+}
+
+message SummaryNewsResponse {
+  bool success = 1;
+  string summarized_text = 2;
+}

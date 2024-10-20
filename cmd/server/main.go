@@ -69,7 +69,17 @@ func main() {
 	defer audioConn.Close()
 	audioClient := proto.NewAudioServiceClient(audioConn)
 
-	handler := handlers.New(db, jwt, logger, newsClient, audioClient)
+	summaryConn, err := grpc.NewClient(cfg.SummaryURL, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithDefaultServiceConfig(retryPolicy))
+
+	if err != nil {
+		logger.Fatal().Err(err).Msg("Failed to connect to summary service")
+	} else {
+		logger.Info().Msg("Successfully connected to summary service")
+	}
+	defer summaryConn.Close()
+	summaryClient := proto.NewSummaryServiceClient(summaryConn)
+
+	handler := handlers.New(db, jwt, logger, newsClient, audioClient, summaryClient)
 
 	// Initialize Gin
 	r := gin.Default()
@@ -118,6 +128,12 @@ func main() {
 		audioGroup.GET("/:id", handler.GetAudioFile)
 		audioGroup.POST("/content", handler.ReceiveNewsContent)
 		audioGroup.GET("/stream/:id", handler.StreamAudioFile)
+	}
+
+	// Route summary
+	summaryGroup := r.Group("api/summary")
+	{
+		summaryGroup.GET("/one", handler.SummarizeNews)
 	}
 
 	// admin := r.Group("/api/admin")

@@ -13,6 +13,7 @@ type Config struct {
 	JWTExpirationHours time.Duration
 	ScraperURL         string
 	VoiceURL           string
+	SummaryURL		   string
 }
 
 func Load() (*Config, error) {
@@ -28,5 +29,6 @@ func Load() (*Config, error) {
 		JWTExpirationHours: time.Duration(jwtExpirationHours) * time.Hour,
 		ScraperURL:         os.Getenv("SCRAPER_SERVICE"),
 		VoiceURL:           os.Getenv("VOICE_SERVICE"),
+		SummaryURL:         os.Getenv("SUMMARY_SERVICE"),
 	}, nil
 }
