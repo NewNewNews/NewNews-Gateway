@@ -27,6 +27,7 @@ func (h *Handler) GetAudioFile(c *gin.Context) {
 	// Set the appropriate headers for file download
 	c.Header("Content-Disposition", "attachment; filename="+audioResponse.FileName)
 	c.Data(http.StatusOK, "audio/mpeg", audioResponse.AudioData)
+	fmt.Printf("Audio data size: %d bytes\n", len(audioResponse.AudioData))
 }
 
 // ReceiveNewsContent receives news content and processes it (presumably for text-to-speech conversion)
