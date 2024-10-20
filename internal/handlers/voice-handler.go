@@ -11,13 +11,31 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type AudioRequest struct {
+    NewsID string `json:"id"`
+}
+
 // GetAudioFile retrieves an audio file for a given news ID
 func (h *Handler) GetAudioFile(c *gin.Context) {
+	// Get parameter from JSON request
+	var req AudioRequest
+	
+	// Bind JSON request body to the struct
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.logger.Error().Err(err).Msg("Failed to parse request")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	url := req.NewsID
+
 	newsID := c.Param("id")
 
 	// Call the audio service to get the audio file
 	fmt.Println("newsID:", newsID)
-	audioResponse, err := h.newsVoice.GetAudioFile(context.Background(), &proto.AudioRequest{NewsId: newsID})
+	fmt.Println("url:", url)
+
+	audioResponse, err := h.newsVoice.GetAudioFile(context.Background(), &proto.AudioRequest{NewsId: url})
 	if err != nil {
 		h.logger.Error().Err(err).Msg("Failed to get audio file")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get audio file"})
