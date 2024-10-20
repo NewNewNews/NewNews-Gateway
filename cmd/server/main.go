@@ -59,7 +59,17 @@ func main() {
 	defer newsConn.Close()
 	newsClient := proto.NewNewsServiceClient(newsConn)
 
-	handler := handlers.New(db, jwt, logger, newsClient)
+	audioConn, err := grpc.NewClient(cfg.VoiceURL, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithDefaultServiceConfig(retryPolicy))
+
+	if err != nil {
+		logger.Fatal().Err(err).Msg("Failed to connect to audio service")
+	} else {
+		logger.Info().Msg("Successfully connected to audio service")
+	}
+	defer audioConn.Close()
+	audioClient := proto.NewAudioServiceClient(audioConn)
+
+	handler := handlers.New(db, jwt, logger, newsClient, audioClient)
 
 	// Initialize Gin
 	r := gin.Default()
@@ -101,6 +111,14 @@ func main() {
 	r.PUT("/api/news", handler.UpdateNews)
 	r.DELETE("/api/news", handler.DeleteNews)
 	r.GET("/api/news/one", handler.GetOneNews)
+
+	// Route audio
+	audioGroup := r.Group("api/audio")
+	{
+		audioGroup.GET("/:id", handler.GetAudioFile)
+		audioGroup.POST("/content", handler.ReceiveNewsContent)
+		audioGroup.GET("/stream/:id", handler.StreamAudioFile)
+	}
 
 	// admin := r.Group("/api/admin")
 	// admin.Use(auth.AuthMiddleware(jwt), auth.AdminMiddleware())

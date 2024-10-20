@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AudioService_GetAudioFile_FullMethodName       = "/news.AudioService/GetAudioFile"
-	AudioService_ReceiveNewsContent_FullMethodName = "/news.AudioService/ReceiveNewsContent"
+	AudioService_GetAudioFile_FullMethodName       = "/audioservice.AudioService/GetAudioFile"
+	AudioService_ReceiveNewsContent_FullMethodName = "/audioservice.AudioService/ReceiveNewsContent"
 )
 
 // AudioServiceClient is the client API for AudioService service.
@@ -142,7 +142,7 @@ func _AudioService_ReceiveNewsContent_Handler(srv interface{}, ctx context.Conte
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var AudioService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "news.AudioService",
+	ServiceName: "audioservice.AudioService",
 	HandlerType: (*AudioServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

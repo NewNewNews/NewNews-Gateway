@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package news;
+package audioservice;
 
 option go_package = "github.com/yourusername/gateway/internal/proto";
 
