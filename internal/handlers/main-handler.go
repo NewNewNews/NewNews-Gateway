@@ -18,10 +18,11 @@ type Handler struct {
 	logger     zerolog.Logger
 	newsClient proto.NewsServiceClient
 	newsVoice  proto.AudioServiceClient
+	newsSummary proto.SummaryServiceClient
 }
 
-func New(db *database.Database, jwt *auth.JWTManager, logger zerolog.Logger, newsClient proto.NewsServiceClient, newsVoice proto.AudioServiceClient) *Handler {
-	return &Handler{db: db, jwt: jwt, logger: logger, newsClient: newsClient, newsVoice: newsVoice}
+func New(db *database.Database, jwt *auth.JWTManager, logger zerolog.Logger, newsClient proto.NewsServiceClient, newsVoice proto.AudioServiceClient, newsSummary proto.SummaryServiceClient) *Handler {
+	return &Handler{db: db, jwt: jwt, logger: logger, newsClient: newsClient, newsVoice: newsVoice, newsSummary: newsSummary}
 }
 
 func (h *Handler) Protected(c *gin.Context) {
