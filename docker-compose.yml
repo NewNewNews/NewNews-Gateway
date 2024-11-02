@@ -1,7 +1,8 @@
-version: "3.8"
 services:
   gateway:
     build: .
+    container_name: gateway
+    hostname: gateway
     ports:
       - "8080:8080"
     depends_on:
@@ -9,8 +10,13 @@ services:
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/gateway?schema=public
       - SCRAPER_SERVICE=news_service:50051
+      - VOICE_SERVICE=voice_service:50052
+      - SUMMARY_SERVICE=summary_service:50053
+      - JWT_SECRET=your_jwt_secret_here
+      - JWT_EXPIRATION_HOURS=24
+      - PORT=8080
     networks:
-      - my-custom-network
+      - app_network
 
   db:
     image: postgres:13
@@ -23,11 +29,11 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - my-custom-network
+      - app_network
 
 volumes:
   postgres_data:
 
 networks:
-  my-custom-network:
+  app_network:
     external: true
