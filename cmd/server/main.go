@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/NewNewNews/NewNews-Gateway/internal/auth"
 	"github.com/NewNewNews/NewNews-Gateway/internal/config"
@@ -85,11 +86,14 @@ func main() {
 	r := gin.Default()
 
 	// Configure CORS
-	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:3000"} // Your frontend origin
-	config.AllowCredentials = true
-	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
-	config.AllowHeaders = []string{"Content-Type", "Authorization"}
+	config := cors.Config{
+		AllowOrigins:     []string{"http://nginx:80", "http://localhost:8090", "http://localhost:80", "http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}
+
 	r.Use(cors.New(config))
 
 	// Define routes
