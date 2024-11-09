@@ -80,7 +80,17 @@ func main() {
 	defer summaryConn.Close()
 	summaryClient := proto.NewSummaryServiceClient(summaryConn)
 
-	handler := handlers.New(db, jwt, logger, newsClient, audioClient, summaryClient)
+	comparisonConn, err := grpc.NewClient(cfg.CompareURL, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithDefaultServiceConfig(retryPolicy))
+
+	if err != nil {
+		logger.Fatal().Err(err).Msg("Failed to connect to summary service")
+	} else {
+		logger.Info().Msg("Successfully connected to summary service")
+	}
+	defer comparisonConn.Close()
+	comparisonClient := proto.NewComparisonServiceClient(comparisonConn)
+
+	handler := handlers.New(db, jwt, logger, newsClient, audioClient, summaryClient, comparisonClient)
 
 	// Initialize Gin
 	r := gin.Default()

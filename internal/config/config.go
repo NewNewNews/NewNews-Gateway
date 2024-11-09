@@ -14,6 +14,7 @@ type Config struct {
 	ScraperURL         string
 	VoiceURL           string
 	SummaryURL		   string
+	CompareURL         string
 }
 
 func Load() (*Config, error) {
@@ -30,5 +31,6 @@ func Load() (*Config, error) {
 		ScraperURL:         os.Getenv("SCRAPER_SERVICE"),
 		VoiceURL:           os.Getenv("VOICE_SERVICE"),
 		SummaryURL:         os.Getenv("SUMMARY_SERVICE"),
+		CompareURL:         os.Getenv("COMPARE_SERVICE"),
 	}, nil
 }

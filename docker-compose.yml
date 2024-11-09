@@ -12,6 +12,7 @@ services:
       - SCRAPER_SERVICE=news_service:50051
       - VOICE_SERVICE=voice_service:50052
       - SUMMARY_SERVICE=summary_service:50053
+      - COMPARE_SERVICE=compare_service:50054
       - JWT_SECRET=your_jwt_secret_here
       - JWT_EXPIRATION_HOURS=24
       - PORT=8080

@@ -13,16 +13,17 @@ import (
 )
 
 type Handler struct {
-	db         *database.Database
-	jwt        *auth.JWTManager
-	logger     zerolog.Logger
-	newsClient proto.NewsServiceClient
-	newsVoice  proto.AudioServiceClient
+	db          *database.Database
+	jwt         *auth.JWTManager
+	logger      zerolog.Logger
+	newsClient  proto.NewsServiceClient
+	newsVoice   proto.AudioServiceClient
 	newsSummary proto.SummaryServiceClient
+	newsCompare proto.ComparisonServiceClient
 }
 
-func New(db *database.Database, jwt *auth.JWTManager, logger zerolog.Logger, newsClient proto.NewsServiceClient, newsVoice proto.AudioServiceClient, newsSummary proto.SummaryServiceClient) *Handler {
-	return &Handler{db: db, jwt: jwt, logger: logger, newsClient: newsClient, newsVoice: newsVoice, newsSummary: newsSummary}
+func New(db *database.Database, jwt *auth.JWTManager, logger zerolog.Logger, newsClient proto.NewsServiceClient, newsVoice proto.AudioServiceClient, newsSummary proto.SummaryServiceClient, newsCompare proto.ComparisonServiceClient) *Handler {
+	return &Handler{db: db, jwt: jwt, logger: logger, newsClient: newsClient, newsVoice: newsVoice, newsSummary: newsSummary, newsCompare: newsCompare}
 }
 
 func (h *Handler) Protected(c *gin.Context) {
