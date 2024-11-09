@@ -137,7 +137,7 @@ func main() {
 	// Route summary
 	summaryGroup := r.Group("api/summary")
 	{
-		summaryGroup.GET("/one", handler.SummarizeNews)
+		summaryGroup.POST("/one", handler.SummarizeNews)
 	}
 
 	// admin := r.Group("/api/admin")
