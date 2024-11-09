@@ -139,7 +139,7 @@ func main() {
 	// Route audio
 	audioGroup := r.Group("api/audio")
 	{
-		audioGroup.GET("/:id", handler.GetAudioFile)
+		audioGroup.POST("/:id", handler.GetAudioFile)
 		audioGroup.POST("/content", handler.ReceiveNewsContent)
 		audioGroup.GET("/stream/:id", handler.StreamAudioFile)
 	}
