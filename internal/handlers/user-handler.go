@@ -33,7 +33,7 @@ func (h *Handler) Register(c *gin.Context) {
 func (h *Handler) Login(c *gin.Context) {
 	var credentials struct {
 		Email    string `json:"email"`
-		Password string `json:"password"`
+		HashedPassword string `json:"-"`
 	}
 	if err := c.ShouldBindJSON(&credentials); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
@@ -46,7 +46,7 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(credentials.Password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(credentials.HashedPassword)); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
@@ -64,14 +64,14 @@ func (h *Handler) Login(c *gin.Context) {
 		int(h.jwt.GetExpiration().Seconds()), // Max age in seconds
 		"/",                                  // Path
 		"",                                   // Domain
-		false,                                 // Secure
-		false,                                 // HttpOnly
+		false,                                // Secure
+		false,                                // HttpOnly
 	)
 
 	// c.JSON(http.StatusOK, gin.H{"message": "Login successful"})
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Login successful",
-		"email": user.Email,
+		"email":   user.Email,
 	})
 }
 
