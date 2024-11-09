@@ -97,11 +97,13 @@ func main() {
 
 	// Configure CORS
 	config := cors.Config{
-		AllowOrigins:     []string{"http://nginx:80", "http://localhost:8090", "http://localhost:80", "http://localhost:3000"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		// AllowOrigins:     []string{"http://nginx:80", "http://nginx:443", "http://localhost:8090", "http://nextjs:3000", "http://localhost:80", "http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
+		AllowHeaders:     []string{"Content-Type", "Authorization", "X-CSRF-Token", "X-Requested-With", "Accept", "X-Api-Version"},
+		ExposeHeaders:    []string{"Content-Length", "X-Api-Version"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
+		AllowAllOrigins:  true,
 	}
 
 	r.Use(cors.New(config))
