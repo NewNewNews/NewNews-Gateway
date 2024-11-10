@@ -58,12 +58,10 @@ func (h *Handler) UpdateNews(c *gin.Context) {
 	}
 
 	resp, err := h.newsClient.UpdateNews(c, &proto.UpdateNewsRequest{
-		Id:        updateReq.ID,
-		Data:      updateReq.Data,
-		Category:  updateReq.Category,
-		Date:      updateReq.Date,
-		Publisher: updateReq.Publisher,
-		Url:       updateReq.URL,
+		Url:      updateReq.URL,
+		Data:     updateReq.Data,
+		Category: updateReq.Category,
+		Date:     updateReq.Date,
 	})
 
 	if err != nil {
@@ -79,7 +77,7 @@ func (h *Handler) UpdateNews(c *gin.Context) {
 
 func (h *Handler) DeleteNews(c *gin.Context) {
 	var deleteReq struct {
-		ID string `json:"id"`
+		URL string `json:"url"`
 	}
 
 	if err := c.ShouldBindJSON(&deleteReq); err != nil {
@@ -88,7 +86,7 @@ func (h *Handler) DeleteNews(c *gin.Context) {
 	}
 
 	resp, err := h.newsClient.DeleteNews(c, &proto.DeleteNewsRequest{
-		Id: deleteReq.ID,
+		Url: deleteReq.URL,
 	})
 
 	if err != nil {
