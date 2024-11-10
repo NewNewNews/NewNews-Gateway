@@ -21,7 +21,6 @@ WORKDIR /root/
 
 # Install necessary tools
 RUN apk add --no-cache wget postgresql-client
-
 # Copy binary and necessary files from builder
 COPY --from=builder /app/gateway .
 COPY --from=builder /app/.env .
