@@ -1,4 +1,4 @@
-# Dockerfile
+# Builder stage
 FROM golang:1.21.6-alpine AS builder
 
 WORKDIR /app
@@ -14,13 +14,14 @@ RUN go run github.com/steebchen/prisma-client-go generate
 COPY . .
 RUN go build -o gateway ./cmd/server
 
-FROM alpine:latest
+# Runtime stage
+FROM golang:1.21.6-alpine
 
 WORKDIR /root/
 
 # Install necessary tools
-RUN apk add --no-cache wget
-
+RUN apk add --no-cache wget postgresql-client
+# Copy binary and necessary files from builder
 COPY --from=builder /app/gateway .
 COPY --from=builder /app/.env .
 COPY --from=builder /app/prisma ./prisma
