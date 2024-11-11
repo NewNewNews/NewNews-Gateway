@@ -11,7 +11,7 @@ import (
 
 // ComparisonRequest represents the request body for getting comparisons.
 type ComparisonRequest struct {
-	EventID string `json:"event_id"`
+	EventId string `json:"event_id"`
 	Date string `json:"date"`
 }
 
@@ -26,7 +26,7 @@ func (h *Handler) GetComparison(c *gin.Context) {
 
 	comparisonResponse, err := h.newsCompare.GetComparison(
 		context.Background(),
-		&proto.GetComparisonRequest{EventID: req.EventID, Date: req.Date},
+		&proto.GetComparisonRequest{EventId: req.EventId, Date: req.Date},
 	)
 	
 	if err != nil {
