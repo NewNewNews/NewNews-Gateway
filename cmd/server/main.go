@@ -152,6 +152,12 @@ func main() {
 		summaryGroup.POST("/one", handler.SummarizeNews)
 	}
 
+	// Route summary
+	compareGroup := r.Group("api/compare")
+	{
+		compareGroup.POST("/one", handler.GetComparison)
+	}
+
 	// admin := r.Group("/api/admin")
 	// admin.Use(auth.AuthMiddleware(jwt), auth.AdminMiddleware())
 	// {

@@ -13,7 +13,8 @@ message Comparison {
 }
 
 message GetComparisonRequest {
-  string news_id = 1;
+  string event_id = 1;
+  string date = 2;
 }
 
 service ComparisonService {
