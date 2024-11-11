@@ -83,9 +83,9 @@ func main() {
 	comparisonConn, err := grpc.NewClient(cfg.CompareURL, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithDefaultServiceConfig(retryPolicy))
 
 	if err != nil {
-		logger.Fatal().Err(err).Msg("Failed to connect to summary service")
+		logger.Fatal().Err(err).Msg("Failed to connect to compare service")
 	} else {
-		logger.Info().Msg("Successfully connected to summary service")
+		logger.Info().Msg("Successfully connected to compare service")
 	}
 	defer comparisonConn.Close()
 	comparisonClient := proto.NewComparisonServiceClient(comparisonConn)
