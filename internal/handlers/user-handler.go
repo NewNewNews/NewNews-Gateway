@@ -33,7 +33,7 @@ func (h *Handler) Register(c *gin.Context) {
 func (h *Handler) Login(c *gin.Context) {
 	var credentials struct {
 		Email    string `json:"email"`
-		HashedPassword string `json:"-"`
+		HashedPassword string `json:"hashedPassword"`
 	}
 	if err := c.ShouldBindJSON(&credentials); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
